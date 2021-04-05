@@ -1,25 +1,119 @@
 <title>UnrealEd - Texture Alignment</title>
 <script type="text/javascript">
 
-function calculate()
+var pi = 3.14159265;
+var method = 0;
+
+function change_method(index )
 {
-	sides = document.getElementById('sides').value;
-	radius = document.getElementById('radius').value;
-	pi = 3.14159265;
-
-	surface_width = 2*radius*Math.sin(pi/sides);
-
-	document.getElementById("surface_width").value = surface_width;
-	document.getElementById('command').value = "POLY TEXPAN U=" + surface_width;
-	document.getElementById('command').select();
+	method = index;
 }
 
+function trigo_func(num)
+{
+	if(method>0)
+		return Math.sin(num);
+	else
+		return Math.tan(num);
+}
+
+function calculate_panning()
+{
+	var sides = document.getElementById('cp_sides').value;
+	var radius = document.getElementById('cp_radius').value;
+	var scale = document.getElementById('cp_scale').value;
+
+	var surface_width = 2*radius*trigo_func(pi/(sides*scale));
+
+	document.getElementById('cp_surface_width').value = surface_width;
+	document.getElementById('cp_command').value = "POLY TEXPAN U=" + surface_width;
+	document.getElementById('cp_command').select();
+}
+
+function calculate_radius()
+{
+	var sides = document.getElementById('cr_sides').value;
+	var width = document.getElementById('cr_width').value;
+	var scale = document.getElementById('cr_scale').value;
+
+	var radius = (width/sides)/(2*trigo_func(pi/(sides*scale)));
+
+	var cr_radius = document.getElementById('cr_radius');
+	cr_radius.value = radius;
+	cr_radius.select();
+}
+
+function calculate_scale()
+{
+	var sides = document.getElementById('cs_sides').value;
+	var width = document.getElementById('cs_width').value;
+	var radius = document.getElementById('cs_radius').value;
+
+	var scale = (2*radius*trigo_func(pi/sides))*sides/width;
+
+	var cs_scale = document.getElementById('cs_scale')
+	cs_scale.value = scale;
+	cs_scale.select();
+}
+
+
+function calculate_pythagorean()
+{
+	var grid = document.getElementById('pt_grid').value;
+	var side_a = document.getElementById('pt_side_a').value*grid;
+	var side_b = document.getElementById('pt_side_b').value*grid;
+	var side_c = document.getElementById('pt_side_c');
+	var command = document.getElementById('pt_command');
+
+	var surface_width = Math.sqrt(side_a*side_a+side_b*side_b);
+
+	side_c.value = surface_width;
+	command.value = "POLY TEXPAN U=" + surface_width;
+	command.select();
+}
 </script>
 
-sides: <input type="text" id="sides"><br>
-radius: <input type="text" id="radius"><br>
-<input type="button" value="calc" onClick="calculate()"><br>
-width: <input type="text" id="surface_width" value=""><br>
-command: <input type="text" id="command" value=""><br>
+<h1>UnrealEd - Texture Alignment</h1>
 
-<!-- Copyright 2010 by Jerome Bos -->
+method:
+<select onChange="change_method(this.selectedIndex)">
+<option selected value="opt_circumscribed">circumscribed polygon</option>
+<option value="opt_inscribed">inscribed polygon</option>
+</select>
+
+
+<h2>Calculate surface width</h2>
+<p>
+sides: <input type="text" id="cp_sides"><br>
+radius: <input type="text" id="cp_radius"><br>
+scale: <input type="text" id="cp_scale"><br>
+<input type="button" value="calc" onClick="calculate_panning()"><br>
+surface width: <input type="text" id="cp_surface_width" value=""><br>
+command: <input type="text" id="cp_command" value=""><br>
+
+<h2>Calculate radius</h2>
+<p>
+sides: <input type="text" id="cr_sides"><br>
+scale: <input type="text" id="cr_scale"><br>
+texture width: <input type="text" id="cr_width"><br>
+<input type="button" value="calc" onClick="calculate_radius()"><br>
+radius: <input type="text" id="cr_radius" value=""><br>
+
+<h2>Calculate scale</h2>
+<p>
+sides: <input type="text" id="cs_sides"><br>
+texture width: <input type="text" id="cs_width"><br>
+radius: <input type="text" id="cs_radius"><br>
+<input type="button" value="calc" onClick="calculate_scale()"><br>
+scale: <input type="text" id="cs_scale" value=""><br>
+
+<h2>Pythagorean theorem</h2>
+<p>
+grid: <input type="text" id="pt_grid" value="16"><br>
+side a: <input type="text" id="pt_side_a"><br>
+side b: <input type="text" id="pt_side_b"><br>
+<input type="button" value="calc" onClick="calculate_pythagorean()"><br>
+side c: <input type="text" id="pt_side_c"><br>
+command: <input type="text" id="pt_command" value=""><br>
+
+<!-- by Jerome Bos -->

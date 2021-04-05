@@ -1,0 +1,25 @@
+<title>UnrealEd - Texture Alignment</title>
+<script type="text/javascript">
+
+function calculate()
+{
+	sides = document.getElementById('sides').value;
+	radius = document.getElementById('radius').value;
+	pi = 3.14159265;
+
+	surface_width = 2*radius*Math.sin(pi/sides);
+
+	document.getElementById("surface_width").value = surface_width;
+	document.getElementById('command').value = "POLY TEXPAN U=" + surface_width;
+	document.getElementById('command').select();
+}
+
+</script>
+
+sides: <input type="text" id="sides"><br>
+radius: <input type="text" id="radius"><br>
+<input type="button" value="calc" onClick="calculate()"><br>
+width: <input type="text" id="surface_width" value=""><br>
+command: <input type="text" id="command" value=""><br>
+
+<!-- Copyright 2010 by Jerome Bos -->

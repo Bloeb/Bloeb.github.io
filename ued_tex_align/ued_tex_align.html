@@ -5,6 +5,10 @@
 --------------------------------------------------------------------------------
 :: Release information
 --------------------------------------------------------------------------------
+
+Release v6 (5 April 2021)
+* Fixed incorrect calculations for circular brushes
+
 Release v5 (14 January 2015)
 * Fixed bug in selecting correct polygon method (special thanks to Roel)
 
@@ -139,7 +143,7 @@ function calculate_panning()
 	var radius = document.getElementById('cp_radius').value;
 	var scale = document.getElementById('cp_scale').value;
 
-	var surface_width = 2*radius*trigo_func(pi/(sides*scale));
+	var surface_width = 2*radius*trigo_func(pi/sides)/scale;
 
 	document.getElementById('cp_surface_width').value = surface_width;
 	document.getElementById('cp_command').value = "POLY TEXPAN U=" + surface_width;
@@ -152,7 +156,7 @@ function calculate_radius()
 	var width = document.getElementById('cr_width').value;
 	var scale = document.getElementById('cr_scale').value;
 
-	var radius = (width/sides)/(2*trigo_func(pi/(sides*scale)));
+	var radius = (width/sides)/(2*trigo_func(pi/sides))*scale;
 
 	var cr_radius = document.getElementById('cr_radius');
 	cr_radius.value = radius;

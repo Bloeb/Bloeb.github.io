@@ -1,17 +1,37 @@
-<title>UnrealEd - Texture Alignment</title>
+<title>UnrealEd - Texture Alignment - Jerome Bos</title>
 <script type="text/javascript">
 
 var pi = 3.14159265;
-var method = 0;
+var trigo_method = 0;
+var rotation_angle_measurement = 0;
+var connected_brushes_angle_measurement = 0;
 
-function change_method(index )
+function select_rotation_angle_measurement(index)
+{
+	rotation_angle_measurement = index;
+}
+
+function select_connected_brushes_angle_measurement(index)
+{
+	connected_brushes_angle_measurement = index;
+}
+
+function angle_func(num, angle_measurement)
+{
+	if(angle_measurement>0)
+		return num * pi / 180;
+	else
+		return num;
+}
+
+function select_trigo_method(index)
 {
 	method = index;
 }
 
 function trigo_func(num)
 {
-	if(method>0)
+	if(trigo_method>0)
 		return Math.sin(num);
 	else
 		return Math.tan(num);
@@ -56,33 +76,64 @@ function calculate_scale()
 	cs_scale.select();
 }
 
-
-function calculate_pythagorean()
+function calculate_connected_brushes()
 {
-	var grid = document.getElementById('pt_grid').value;
-	var side_a = document.getElementById('pt_side_a').value*grid;
-	var side_b = document.getElementById('pt_side_b').value*grid;
-	var side_c = document.getElementById('pt_side_c');
-	var command = document.getElementById('pt_command');
+	var grid = document.getElementById('connected_brushes_grid').value;
+	var side_adjacent = document.getElementById('connected_brushes_side_adjacent').value*grid;
+	var side_opposite = document.getElementById('connected_brushes_side_opposite').value*grid;
+	var angle = angle_func(document.getElementById('connected_brushes_angle').value,connected_brushes_angle_measurement);
+	var width = document.getElementById('connected_brushes_width');
+	var hypotenuse = document.getElementById('connected_brushes_hypotenuse');
+	var scale_adjacent = document.getElementById('connected_brushes_scale_adjacent');
+	var scale_opposite = document.getElementById('connected_brushes_scale_opposite');
 
-	var surface_width = Math.sqrt(side_a*side_a+side_b*side_b);
+	var hypotenuse_calc = Math.sqrt(side_adjacent*side_adjacent+side_opposite*side_opposite);
+	var width_calc = Math.cos(angle-Math.atan(side_opposite/side_adjacent))*hypotenuse_calc;
 
-	side_c.value = surface_width;
-	command.value = "POLY TEXPAN U=" + surface_width;
+	hypotenuse.value = hypotenuse_calc;
+	scale_adjacent.value = width_calc/side_adjacent;
+	scale_opposite.value = width_calc/side_opposite;
+	width.value = width_calc;
+	width.select();
+}
+
+function calculate_rotation()
+{
+	var angle = angle_func(document.getElementById('rot_angle').value,rotation_angle_measurement);
+	var command = document.getElementById('rot_command');
+	
+	var uu = Math.cos(angle);
+	var uv = -Math.sin(angle);
+	var vu = Math.sin(angle);
+	var vv = Math.cos(angle);
+	
+	command.value = "POLY TEXMULT UU=" + uu + " UV=" + uv + " VU=" + vu + " VV=" + vv;
 	command.select();
 }
 </script>
 
 <h1>UnrealEd - Texture Alignment</h1>
 
+<h2>1. Circular brushes</h2>
+
 method:
-<select onChange="change_method(this.selectedIndex)">
+<select onChange="select_trigo_method(this.selectedIndex)">
 <option selected value="opt_circumscribed">circumscribed polygon</option>
 <option value="opt_inscribed">inscribed polygon</option>
 </select>
 
+<h3 id="calculate_surface_width">1.1. Calculate surface width</h3>
+<p>Aligning circular brushes:
+<ol>
+<li>Make a circular brush and apply a texture.
+<li>Scale the textures.
+<li>Select all surfaces that need to be aligned.
+<li>Apply the calculated command.
+<li>Deselect the most outward surface (either left or right).
+<li>Apply the calculated command again.
+<li>Repeat this method untill all surfaces are aligned.
+</ol>
 
-<h2>Calculate surface width</h2>
 <p>
 sides: <input type="text" id="cp_sides"><br>
 radius: <input type="text" id="cp_radius"><br>
@@ -91,7 +142,7 @@ scale: <input type="text" id="cp_scale"><br>
 surface width: <input type="text" id="cp_surface_width" value=""><br>
 command: <input type="text" id="cp_command" value=""><br>
 
-<h2>Calculate radius</h2>
+<h3 id="calculate_radius">1.2. Calculate radius</h3>
 <p>
 sides: <input type="text" id="cr_sides"><br>
 scale: <input type="text" id="cr_scale"><br>
@@ -99,7 +150,7 @@ texture width: <input type="text" id="cr_width"><br>
 <input type="button" value="calc" onClick="calculate_radius()"><br>
 radius: <input type="text" id="cr_radius" value=""><br>
 
-<h2>Calculate scale</h2>
+<h3 id="calculate_scale">1.3. Calculate scale</h3>
 <p>
 sides: <input type="text" id="cs_sides"><br>
 texture width: <input type="text" id="cs_width"><br>
@@ -107,13 +158,28 @@ radius: <input type="text" id="cs_radius"><br>
 <input type="button" value="calc" onClick="calculate_scale()"><br>
 scale: <input type="text" id="cs_scale" value=""><br>
 
-<h2>Pythagorean theorem</h2>
-<p>
-grid: <input type="text" id="pt_grid" value="16"><br>
-side a: <input type="text" id="pt_side_a"><br>
-side b: <input type="text" id="pt_side_b"><br>
-<input type="button" value="calc" onClick="calculate_pythagorean()"><br>
-side c: <input type="text" id="pt_side_c"><br>
-command: <input type="text" id="pt_command" value=""><br>
+<h2 id="connected_brushes">2. Connected brushes</h2>
+grid: <input type="text" id="connected_brushes_grid" value="16"><br>
+adjacent side: <input type="text" id="connected_brushes_side_adjacent"><br>
+opposite side: <input type="text" id="connected_brushes_side_opposite"><br>
+angle: <input type="text" id="connected_brushes_angle" value="">
+<select onChange="select_connected_brushes_angle_measurement(this.selectedIndex)">
+<option selected value="connected_brushes_opt_radians">radians</option>
+<option value="connected_brushes_opt_degrees">degrees</option>
+</select><br>
+<input type="button" value="calc" onClick="calculate_connected_brushes()"><br>
+hypotenuse: <input type="text" id="connected_brushes_hypotenuse"><br>
+width: <input type="text" id="connected_brushes_width"><br>
+scale adjacent: <input type="text" id="connected_brushes_scale_adjacent" value=""><br>
+scale opposite: <input type="text" id="connected_brushes_scale_opposite" value=""><br>
+
+<h2 id="rotation">3. Rotation</h2>
+angle: <input type="text" id="rot_angle" value="">
+<select onChange="select_rotation_angle_measurement(this.selectedIndex)">
+<option selected value="rot_opt_radians">radians</option>
+<option value="rot_opt_degrees">degrees</option>
+</select><br>
+<input type="button" value="calc" onClick="calculate_rotation()"><br>
+command: <input type="text" id="rot_command" value=""><br>
 
 <!-- by Jerome Bos -->

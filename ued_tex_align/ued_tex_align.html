@@ -5,6 +5,8 @@
 --------------------------------------------------------------------------------
 :: Release information
 --------------------------------------------------------------------------------
+Release v5 (14 January 2015)
+* Fixed bug in selecting correct polygon method (special thanks to Roel)
 
 Release v4 (1 July 2014):
 * Added options for angular brushes
@@ -35,7 +37,7 @@ Thanks to the Unreal Wiki (http://wiki.beyondunreal.com) for information on scri
 :: License
 --------------------------------------------------------------------------------
 
-  Copyright (c) 2010 - 2014 Jerome Bos
+  Copyright (c) 2010 - 2015 Jerome Bos
 
   Permission is hereby granted, free of charge, to any person
   obtaining a copy of this software and associated documentation
@@ -120,7 +122,7 @@ function angle_func(num, angle_measurement)
 
 function select_trigo_method(index)
 {
-	method = index;
+	trigo_method = index;
 }
 
 function trigo_func(num)

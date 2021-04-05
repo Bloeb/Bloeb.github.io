@@ -1,10 +1,104 @@
+<!--
+
+[ UnrealEd - Texture Alignment]
+
+--------------------------------------------------------------------------------
+:: Release information
+--------------------------------------------------------------------------------
+
+Release v4 (1 July 2014):
+* Added options for angular brushes
+* Added some explanatory pictures
+* Added collapsing sections
+
+Release v3 (16 June 2014):
+* Added options for texture rotation
+
+Release v2 (22 July 2010):
+* Added additional options for circular brushes
+
+Release v1 (23 June 2010):
+* Added options for circular brushes
+
+--------------------------------------------------------------------------------
+:: Additional information
+--------------------------------------------------------------------------------
+
+Developer / Maintainer:
+  Jerome Bos a.k.a. Bloeb
+
+Thanks to the BT-community for their ideas, support, bugreports and testing.
+
+Thanks to the Unreal Wiki (http://wiki.beyondunreal.com) for information on scripting.
+
+--------------------------------------------------------------------------------
+:: License
+--------------------------------------------------------------------------------
+
+  Copyright (c) 2010 - 2014 Jerome Bos
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation
+  files (the "Software"), to deal in the Software without
+  restriction, including without limitation the rights to use,
+  copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the
+  Software is furnished to do so, subject to the following
+  conditions:
+
+  1. The above copyright notice and this permission notice shall be
+     included in all copies or substantial portions of the Software.
+  2. Except as contained in this notice, the names of the authors and
+     copyright holders, shall not be used in advertising or otherwise
+     to promote the sale, use or other dealings in this Software
+     without prior written authorization from the copyright holders.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+  OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+  OTHER DEALINGS IN THE SOFTWARE.
+
+-->
+
 <title>UnrealEd - Texture Alignment - Jerome Bos</title>
+
+<style type="text/css">
+h2, h3
+{
+	cursor: pointer;
+}
+
+.section
+{
+	display: none;
+}
+
+body
+{
+	font-family: Calibri, Arial, Sans-serif;
+}
+</style>
+
 <script type="text/javascript">
 
-var pi = 3.14159265;
+var pi = Math.acos(-1); // 3.14159265;
 var trigo_method = 0;
 var rotation_angle_measurement = 0;
 var connected_brushes_angle_measurement = 0;
+
+function display_section(section)
+{
+	var section_element = document.getElementById(section);
+
+	if(section_element.style.display=="block")
+		section_element.style.display="none";
+	else
+		section_element.style.display="block";
+}
 
 function select_rotation_angle_measurement(index)
 {
@@ -76,6 +170,20 @@ function calculate_scale()
 	cs_scale.select();
 }
 
+function calculate_angle_from_slope()
+{
+	var adjacent = document.getElementById('angle_slope_adjacent').value;
+	var opposite = document.getElementById('angle_slope_opposite').value;
+	var angle_radians = document.getElementById('angle_slope_radians');
+	var angle_degrees = document.getElementById('angle_slope_degrees');
+	
+	var angle = Math.atan(opposite/adjacent);
+
+	angle_degrees.value = angle * 180 / pi;
+	angle_radians.value = angle;
+	angle_radians.select();
+}
+
 function calculate_connected_brushes()
 {
 	var grid = document.getElementById('connected_brushes_grid').value;
@@ -110,19 +218,64 @@ function calculate_rotation()
 	command.value = "POLY TEXMULT UU=" + uu + " UV=" + uv + " VU=" + vu + " VV=" + vv;
 	command.select();
 }
+
 </script>
 
 <h1>UnrealEd - Texture Alignment</h1>
-
-<h2>1. Circular brushes</h2>
-
+<h2 id="circular_brushes" onClick="display_section('circular_brushes_section')">1. Circular brushes</h2>
+<div id="circular_brushes_section" class="section">
+<p>
+<svg width="384" height="256" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<defs>
+		<path id="radius_path" d="M120,128 L120,64" />
+		<path id="surface_width_path" d="M160,32 L320,32" />
+		<path id="circumscribed_path" d="M64,224 L256,224" />
+		<path id="inscribed_path" d="M80,224 L256,224" />
+	</defs>
+	<rect x="0" y="0" width="384" height="256" stroke="#000" stroke-width="2" fill="#fff" />
+	<g id="circumscribed" transform="translate(-32,0)">
+		<circle cx="128" cy="128" r="64" fill="none" stroke="#000" stroke-width="1" />
+		<polyline points="128,128 128,64" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="5,5" stroke-linecap="round" />
+		<polygon points="164.95041722813605,192
+						 201.9008344562721,128
+						 164.95041722813605,64
+						 91.04958277186398,63.999999999999986
+						 54.099165543727906,127.99999999999999
+						 91.04958277186392,191.99999999999997" fill="none" stroke="#000" stroke-width="2" />
+		<polyline points="201.9008344562721,128 164.95041722813605,64" fill="none" stroke="#f00" stroke-width="3" stroke-linecap="round" />
+		<g font-family="Calibri, Arial, Sans-serif" font-size="12">
+			<text fill="#000"><textPath xlink:href="#radius_path">radius</textPath></text>
+			<text fill="#000"><textPath xlink:href="#circumscribed_path">circumscribed polygon</textPath></text>
+		</g>
+	</g>
+	<g id="inscribed" transform="translate(160,0)">
+		<circle cx="128" cy="128" r="64" fill="none" stroke="#000" stroke-width="1" />
+		<polyline points="128,128 128,64" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="5,5" stroke-linecap="round" />
+		<polygon points="128,192
+						 183.42562584220406,160
+						 183.42562584220408,96.00000000000001
+						 128,64
+						 72.57437415779594,95.99999999999997
+						 72.57437415779593,160" fill="none" stroke="#000" stroke-width="2" />
+		<polyline points="183.42562584220408,96.00000000000001 128,64" fill="none" stroke="#f00" stroke-width="3" stroke-linecap="round" />
+		<g font-family="Calibri, Arial, Sans-serif" font-size="12">
+			<text fill="#000"><textPath xlink:href="#radius_path">radius</textPath></text>
+			<text fill="#000"><textPath xlink:href="#inscribed_path">inscribed polygon</textPath></text>
+		</g>
+	</g>
+	<text font-family="Calibri, Arial, Sans-serif" font-size="12" fill="#f00">
+		<textPath xlink:href="#surface_width_path">surface width</textPath>
+	</text>
+</svg>
+<p>
 method:
 <select onChange="select_trigo_method(this.selectedIndex)">
 <option selected value="opt_circumscribed">circumscribed polygon</option>
 <option value="opt_inscribed">inscribed polygon</option>
 </select>
 
-<h3 id="calculate_surface_width">1.1. Calculate surface width</h3>
+<h3 id="calculate_surface_width" onClick="display_section('calculate_surface_width_section')">1.1. Surface width</h3>
+<div id="calculate_surface_width_section" class="section">
 <p>Aligning circular brushes:
 <ol>
 <li>Make a circular brush and apply a texture.
@@ -133,7 +286,6 @@ method:
 <li>Apply the calculated command again.
 <li>Repeat this method untill all surfaces are aligned.
 </ol>
-
 <p>
 sides: <input type="text" id="cp_sides"><br>
 radius: <input type="text" id="cp_radius"><br>
@@ -141,24 +293,90 @@ scale: <input type="text" id="cp_scale"><br>
 <input type="button" value="calc" onClick="calculate_panning()"><br>
 surface width: <input type="text" id="cp_surface_width" value=""><br>
 command: <input type="text" id="cp_command" value=""><br>
+</div>
 
-<h3 id="calculate_radius">1.2. Calculate radius</h3>
+<h3 id="calculate_radius" onClick="display_section('calculate_radius_section')">1.2. Radius</h3>
+<div id="calculate_radius_section" class="section">
 <p>
 sides: <input type="text" id="cr_sides"><br>
 scale: <input type="text" id="cr_scale"><br>
 texture width: <input type="text" id="cr_width"><br>
 <input type="button" value="calc" onClick="calculate_radius()"><br>
 radius: <input type="text" id="cr_radius" value=""><br>
+</div>
 
-<h3 id="calculate_scale">1.3. Calculate scale</h3>
+<h3 id="calculate_scale" onClick="display_section('calculate_scale_section')">1.3. Scale</h3>
+<div id="calculate_scale_section" class="section">
 <p>
 sides: <input type="text" id="cs_sides"><br>
 texture width: <input type="text" id="cs_width"><br>
 radius: <input type="text" id="cs_radius"><br>
 <input type="button" value="calc" onClick="calculate_scale()"><br>
 scale: <input type="text" id="cs_scale" value=""><br>
+</div>
 
-<h2 id="connected_brushes">2. Connected brushes</h2>
+</div>
+
+<h2 id="angular_brushes" onClick="display_section('angular_brushes_section')">2. Angular brushes</h2>
+<div id="angular_brushes_section" class="section">
+
+<h3 id="angle_from_slope" onClick="display_section('angle_from_slope_section')">2.1. Angle from slope</h3>
+<div id="angle_from_slope_section" class="section">
+<p>
+<svg width="256" height="192" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<defs>
+		<path id="conv_adjacent_path" d="M128,168 L256,168" />
+		<path id="conv_opposite_path" d="M224,64 L224,128" />
+		<path id="conv_angle_path" d="M96,128 L256,128" />
+	</defs>
+	<rect x="0" y="0" width="256" height="192" stroke="#000" stroke-width="2" fill="#fff" />
+	<polygon points="32,146 208,146 208,32" fill="none" stroke="#000" stroke-width="2" />
+	<path d="M 72 146 A 40 40 0 0 0 65.57256702183963 124.25413272449023" fill="none" stroke="#f00" stroke-width="1" stroke-linecap="round" />
+	<polyline points="198,146 198,136 208,136" fill="none" stroke="#00f" stroke-width="1" stroke-linecap="round" />
+	<g font-family="Calibri, Arial, Sans-serif" font-size="12">
+		<text fill="#000"><textPath xlink:href="#conv_adjacent_path">adjacent</textPath></text>
+		<text fill="#000"><textPath xlink:href="#conv_opposite_path">opposite</textPath></text>
+		<text fill="#f00"><textPath xlink:href="#conv_angle_path">angle</textPath></text>
+	</g>
+</svg>
+<p>
+adjacent: <input type="text" id="angle_slope_adjacent"><br>
+opposite: <input type="text" id="angle_slope_opposite"><br>
+<input type="button" value="calc" onClick="calculate_angle_from_slope()"><br>
+angle: <input type="text" id="angle_slope_radians" value=""> radians<br>
+angle: <input type="text" id="angle_slope_degrees" value=""> degrees<br>
+</div>
+
+<h3 id="connected_brushes" onClick="display_section('connected_brushes_section')">2.2. Width of angular brush</h3>
+<div id="connected_brushes_section" class="section">
+<p>
+<svg width="320" height="320" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<defs>
+		<path id="adjacent_path" d="M192,208 L256,208" />
+		<path id="opposite_path" d="M264,136 L264,256" />
+		<path id="hypotenuse_path" d="M184,156 L266,116" />
+		<path id="width_path" d="M176,128 L240,64" />
+		<path id="angle_path" d="M192,180 L256,180" />
+	</defs>
+	<rect x="0" y="0" width="320" height="320" stroke="#000" stroke-width="2" fill="#fff" />
+	<polyline id="poly_connect_left" points="128,0 256,128 256,320" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" />
+	<polyline id="poly_connect_right" points="0,64 128,192 128,320" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" />
+	<polyline id="poly_connect_middle" points="128,192 256,128" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" />
+	<polyline id="poly_width" points="128,192 224,92" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="5,5" stroke-linecap="round" />
+	<polyline id="poly_adjacent" points="128,192 256,192" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="5,5" stroke-linecap="round" />
+	<polyline id="poly_angle" points="256,0 256,128" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="5,5" stroke-linecap="round" />
+	<polyline id="poly_angle90" points="120,184 128,176 136,184" fill="none" stroke="#00f" stroke-width="1" stroke-linecap="round" />
+	<path id="line_angle1" d="M 168 192 A 40 40 0 0 0 156.2842712474619 163.7157287525381" fill="none" stroke="#f00" stroke-width="1" stroke-linecap="round" />
+	<path id="line_angle2" d="M 256 88 A 40 40 0 0 0 227.7157287525381 99.7157287525381" fill="none" stroke="#f00" stroke-width="1" stroke-linecap="round" />
+	<g font-family="Calibri, Arial, Sans-serif" font-size="12">
+		<text fill="#000"><textPath xlink:href="#adjacent_path">adjacent</textPath></text>
+		<text fill="#000"><textPath xlink:href="#opposite_path">opposite</textPath></text>
+		<text fill="#000"><textPath xlink:href="#hypotenuse_path">hypotenuse</textPath></text>
+		<text fill="#000"><textPath xlink:href="#width_path">width</textPath></text>
+		<text fill="#f00"><textPath xlink:href="#angle_path">angle</textPath></text>
+	</g>
+</svg>
+<p>
 grid: <input type="text" id="connected_brushes_grid" value="16"><br>
 adjacent side: <input type="text" id="connected_brushes_side_adjacent"><br>
 opposite side: <input type="text" id="connected_brushes_side_opposite"><br>
@@ -172,8 +390,13 @@ hypotenuse: <input type="text" id="connected_brushes_hypotenuse"><br>
 width: <input type="text" id="connected_brushes_width"><br>
 scale adjacent: <input type="text" id="connected_brushes_scale_adjacent" value=""><br>
 scale opposite: <input type="text" id="connected_brushes_scale_opposite" value=""><br>
+</div>
 
-<h2 id="rotation">3. Rotation</h2>
+</div>
+
+<h2 id="texture_rotation" onClick="display_section('texture_rotation_section')">3. Texture rotation</h2>
+<div id="texture_rotation_section" class="section">
+<p>
 angle: <input type="text" id="rot_angle" value="">
 <select onChange="select_rotation_angle_measurement(this.selectedIndex)">
 <option selected value="rot_opt_radians">radians</option>
@@ -181,5 +404,4 @@ angle: <input type="text" id="rot_angle" value="">
 </select><br>
 <input type="button" value="calc" onClick="calculate_rotation()"><br>
 command: <input type="text" id="rot_command" value=""><br>
-
-<!-- by Jerome Bos -->
+</div>

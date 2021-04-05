@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<title>Fuel costs</title>
+
+<style type="text/css">
+
+body
+{
+	font-family: Calibri, Arial, Sans-serif;
+}
+
+td
+{
+	padding: 0.2em;
+	border: 1px solid lightsteelblue;
+}
+
+table#settings td
+{
+	border: 0;
+}
+
+</style>
+
+
+<script type="text/javascript">
+
+function calc(parent_id)
+{
+	var parent_ref = document.getElementById(parent_id);
+	var price_per_liter = parseFloat(document.getElementById('price_per_liter').value);
+	var consumption_min = parseFloat(document.getElementById('consumption_min').value);
+	var consumption_max = parseFloat(document.getElementById('consumption_max').value);
+	var consumption_rate = parseFloat(document.getElementById('consumption_rate').value);
+	var distance_min = parseFloat(document.getElementById('distance_min').value);
+	var distance_max = parseFloat(document.getElementById('distance_max').value);
+	var distance_rate = parseFloat(document.getElementById('distance_rate').value);
+
+	var distance_total = (distance_max-distance_min)/distance_rate; 
+	var consumption_total = (consumption_max-consumption_min)/consumption_rate;
+
+	var table_ref = document.createElement('table');
+
+	var row_ref = table_ref.insertRow(0);
+
+	var cell_ref = row_ref.insertCell(0);
+	var text_ref = document.createTextNode('');
+	cell_ref.appendChild(text_ref);
+
+	for(var i=0; i<=consumption_total; ++i)
+	{
+		var consumption = consumption_rate*i+consumption_min;
+		var cell_ref = row_ref.insertCell(i+1);
+		var text_ref = document.createTextNode(consumption+' l/100km');
+		cell_ref.appendChild(text_ref);
+		cell_ref.appendChild(document.createElement('br'));
+		consumption = 100/consumption;
+		text_ref = document.createTextNode('1:'+consumption.toFixed(2));
+		cell_ref.appendChild(text_ref);
+	}
+
+	for(var i=0; i<=distance_total; ++i)
+	{
+		var row_ref = table_ref.insertRow(i+1);
+
+		var distance = distance_rate*i+distance_min;
+		var distance_text = document.createTextNode(distance+' km');
+		var cell_ref = row_ref.insertCell(0);
+		cell_ref.appendChild(distance_text);
+
+
+		for(var j=0; j<=consumption_total; ++j)
+		{
+			var consumption = consumption_rate*j+consumption_min;
+			var price = (parseFloat(distance*consumption)*price_per_liter/100).toFixed(2);
+
+			var cell_ref = row_ref.insertCell(j+1);
+			var text_ref = document.createTextNode('\u20ac'+price);
+			cell_ref.appendChild(text_ref);
+		}
+
+	}
+
+    	var last;
+    	while (last = parent_ref.lastChild) parent_ref.removeChild(last);
+
+	parent_ref.appendChild(table_ref);
+}
+
+</script>
+
+<body>
+
+<form>
+
+<table id="settings">
+	<thead>
+		<tr>
+			<th colspan="2">Settings</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><label for="price_per_liter">Price (&euro;/l):</label></td>
+			<td><input type="number" id="price_per_liter" value="1.5" step="0.1"></td>
+		</tr>
+		<tr>
+			<td><label for="consumption_min">Consumption min (l/100km):</label></td>
+			<td><input type="number" id="consumption_min" value="6" step="1"></td>
+		</tr>
+		<tr>
+			<td><label for="consumption_max">Consumption max (l/100km):</label></td>
+			<td><input type="number" id="consumption_max" value="14" step="1"></td>
+		</tr>
+		<tr>
+			<td><label for="consumption_rate">Consumption rate (l/100km):</label></td>
+			<td><input type="number" id="consumption_rate" value="1" step="0.5"></td>
+		</tr>
+		<tr>
+			<td><label for="distance_min">Distance min (km):</label></td>
+			<td><input type="number" id="distance_min" value="4000" step="1000"></td>
+		</tr>
+		<tr>
+			<td><label for="distance_max">Distance max (km):</label></td>
+			<td><input type="number" id="distance_max" value="20000" step="1000"></td>
+		</tr>
+		<tr>
+			<td><label for="distace_rate">Distance rate (km):</label></td>
+			<td><input type="number" id="distance_rate" value="1000" step="100"></td>
+		</tr>
+	</tbody>
+</table>
+
+<input type="button" value="calculate" onClick="calc('fuel_costs')">
+
+</form>
+
+<p id="fuel_costs">
+
+
+</body>
+
+
+</html>
